@@ -10,29 +10,6 @@
 
 class TetroItem : public QGraphicsPolygonItem {
 protected:
-//    void keyPressed(QKeyEvent * event, int level) {
-//        switch(event -> key()) {
-//            case Qt::Key_Left: {
-//                setPos(pos() - QPointF(GRANULARITY, 0));
-//            break;}
-
-//            case Qt::Key_Right: {
-//                setPos(pos() + QPointF(GRANULARITY, 0));
-//            break;}
-
-//            case Qt::Key_Down: {
-//                setPos(pos() + QPointF(0, GRANULARITY));
-//            break;}
-
-//            case Qt::Key_Space: {
-//                setRotation(rotation() + 90);
-//                if (isIntersectedLevel(level))
-//                    setRotation(rotation() - 90);
-//            break;}
-
-//            default: ;
-//        }
-//    }
 public:
     TetroItem(QGraphicsItem * parent = 0) : QGraphicsPolygonItem(parent) {
         setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 3));
