@@ -7,16 +7,14 @@
 
 class TetroPart : public QGraphicsRectItem {
 public:
-    TetroPart(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
-
-    }
+    TetroPart(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {}
 
     void setRect(qreal ax, qreal ay, qreal w, qreal h) {
         QGraphicsRectItem::setRect(QRectF(ax * GRANULARITY, ay * GRANULARITY, w * GRANULARITY, h * GRANULARITY));
     }
 
     QPointF gridPos() {
-        return (scenePos() + mapToParent(rect().topLeft())) / GRANULARITY;
+        return sceneBoundingRect().topLeft() / GRANULARITY;
     }
 };
 

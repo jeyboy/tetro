@@ -114,9 +114,9 @@ protected:
         QList<QGraphicsItem *> children = active -> childItems();
         for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
             QPointF point = ((TetroPart *)*ch) -> gridPos();
-            qDebug() << "CHECK" << ((TetroPart *)*ch) -> gridPos() << point << end_x_pos << end_y_pos;
             if (point.x() < 0 || point.x() >= end_x_pos) return true;
-            if (point.y() >= end_y_pos) return true;
+            if (point.y() < 0 || point.y() >= end_y_pos) return true;
+            qDebug() << "CHECK" << ((TetroPart *)*ch) -> gridPos() << places[point.x()][point.y()];
             if (places[point.x()][point.y()])
                 return true;
         }
@@ -157,7 +157,7 @@ public:
     }
 
     void startTimer() {
-        timer -> start(DEFAULT_SPEED);
+//        timer -> start(DEFAULT_SPEED);
         onTimer();
     }
 
