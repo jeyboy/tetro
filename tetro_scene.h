@@ -42,7 +42,7 @@ protected slots:
         }
         else {
             if (checkCollision()) {
-                items.insert(active, active -> polygon().translated(active -> pos()));
+                items.insert(active, active -> scenePolygon());
                 active = 0;
                 onTimer();
             }
@@ -89,9 +89,9 @@ protected:
                 break;}
 
                 case Qt::Key_Space: {
-                    active -> setRotation(active -> rotation() + 90);
+                    active -> rotate(90);
                     if (checkCollision())
-                        active -> setRotation(active -> rotation() - 90);
+                        active -> rotate(-90);
                 break;}
 
                 default: ;
@@ -101,7 +101,12 @@ protected:
 
     bool checkCollision() {
         bool intersected = false;
-        QPolygonF active_poly = active -> polygon().translated(active -> pos() + QPointF(0, GRANULARITY));
+//        TetroItem * item = new TetroItem();
+//        item -> setPolygon(active -> scenePolygon());
+//        item -> setBrush(QBrush(Qt::black));
+//        addItem(item);
+
+        QPolygonF active_poly = active -> scenePolygon().translated(QPointF(0, GRANULARITY));
         for(QHash<TetroItem *, QPolygonF>::ConstIterator item = items.cbegin(); item != items.cend(); item++) {
             qDebug() << "PO" << active_poly << item.value() << item.value().intersected(active_poly);
             if (!item.value().intersected(active_poly).isEmpty()) {
@@ -110,7 +115,6 @@ protected:
             }
         }
 
-//        qDebug() << intersected << active -> isIntersectedLevel(end_y_pos);
         return (intersected || active -> isIntersectedLevel(end_y_pos));
     }
 
