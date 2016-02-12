@@ -45,11 +45,50 @@ protected slots:
             active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
             active -> setFocus();
         }
-        else checkCollision();
+        else {
+            if (checkCollision()) {
+                items.insert(active, active -> polygon().translated(active -> pos()));
+                active = 0;
+                onTimer();
+            }
+            else active -> setPos(active -> pos() + QPointF(0, GRANULARITY));
+        }
     }
 
 protected:
-    void checkCollision() {
+    void keyPressEvent(QKeyEvent * event) {
+        if (active) {
+            switch(event -> key()) {
+                case Qt::Key_Left: {
+                    active -> setPos(active -> pos() - QPointF(GRANULARITY, 0));
+                    if (checkCollision())
+                        active -> setPos(active -> pos() + QPointF(GRANULARITY, 0));
+                break;}
+
+                case Qt::Key_Right: {
+                    active -> setPos(active -> pos() + QPointF(GRANULARITY, 0));
+                    if (checkCollision())
+                        active -> setPos(active -> pos() - QPointF(GRANULARITY, 0));
+                break;}
+
+                case Qt::Key_Down: {
+                    active -> setPos(active -> pos() + QPointF(0, GRANULARITY));
+                    if (checkCollision())
+                        active -> setPos(active -> pos() - QPointF(0, GRANULARITY));
+                break;}
+
+                case Qt::Key_Space: {
+                    active -> setRotation(active -> rotation() + 90);
+                    if (checkCollision())
+                        active -> setRotation(active -> rotation() - 90);
+                break;}
+
+                default: ;
+            }
+        }
+    }
+
+    bool checkCollision() {
         bool intersected = false;
         QPolygonF active_poly = active -> polygon().translated(active -> pos() + QPointF(0, GRANULARITY));
         for(QHash<TetroItem *, QPolygonF>::ConstIterator item = items.cbegin(); item != items.cend(); item++)
@@ -58,13 +97,8 @@ protected:
                 break;
             }
 
-        qDebug() << intersected << active -> isIntersectedLevel(end_y_pos);
-        if (intersected || active -> isIntersectedLevel(end_y_pos)) {
-            items.insert(active, active -> polygon().translated(active -> pos()));
-            active = 0;
-            onTimer();
-        }
-        else active -> setPos(active -> pos() + QPointF(0, GRANULARITY));
+//        qDebug() << intersected << active -> isIntersectedLevel(end_y_pos);
+        return (intersected || active -> isIntersectedLevel(end_y_pos));
     }
 
     TetroItem * generateItem(ItemTypes i = random_item) {
