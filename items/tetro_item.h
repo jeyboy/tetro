@@ -18,6 +18,16 @@ public:
         pen = QPen(QBrush(QColor::fromRgb(0,0,0)), 2);
     }
 
+    void setGridPos(int x, int y, bool xcentering = false) {
+        if (xcentering) {
+            QSizeF isize = childrenBoundingRect().size() / GRANULARITY;
+            x -= (int)isize.width() / 2/* - ((int)isize.width() % 2)*/;
+            x = qMax(0, x);
+        }
+
+        setPos(x * GRANULARITY, y * GRANULARITY);
+    }
+
     void pushUp() { setPos(pos() - QPointF(0, GRANULARITY)); }
     void pushDown() { setPos(pos() + QPointF(0, GRANULARITY)); }
     void pushLeft() { setPos(pos() - QPointF(GRANULARITY, 0)); }

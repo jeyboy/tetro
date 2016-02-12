@@ -29,14 +29,14 @@ class TetroScene : public QGraphicsScene {
 
     QTimer * timer;
     TetroItem * active;
-    QList<QVector<bool> > places;
+    QList<QVector<TetroPart *> > places;
     int start_x_pos, end_x_pos, end_y_pos;
 protected slots:
     void onTimer() {
         if (active == 0) {
             active = generateItem();
             addItem(active);
-            active -> setPos(start_x_pos * GRANULARITY, 0);
+            active -> setGridPos(start_x_pos, 0, true);
             active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
             active -> setFocus();
         }
@@ -47,7 +47,7 @@ protected slots:
                 QList<QGraphicsItem *> children = active -> childItems();
                 for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
                     QPointF point = ((TetroPart *)*ch) -> gridPos();
-                    places[point.x()][point.y()] = true;
+                    places[point.x()][point.y()] = ((TetroPart *)*ch);
                 }
                 active = 0;
                 onTimer();
@@ -110,13 +110,11 @@ protected:
 //        item -> setBrush(QBrush(Qt::black));
 //        addItem(item);
 
-        qDebug() << "---------------------------------------------------";
         QList<QGraphicsItem *> children = active -> childItems();
         for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
             QPointF point = ((TetroPart *)*ch) -> gridPos();
             if (point.x() < 0 || point.x() >= end_x_pos) return true;
             if (point.y() < 0 || point.y() >= end_y_pos) return true;
-            qDebug() << "CHECK" << ((TetroPart *)*ch) -> gridPos() << places[point.x()][point.y()];
             if (places[point.x()][point.y()])
                 return true;
         }
@@ -153,11 +151,11 @@ public:
         end_y_pos = height / GRANULARITY;
 
         for(int i = 0; i < end_x_pos; i++)
-            places.append(QVector<bool>().fill(false, end_y_pos));
+            places.append(QVector<TetroPart *>().fill(0, end_y_pos));
     }
 
     void startTimer() {
-//        timer -> start(DEFAULT_SPEED);
+        timer -> start(DEFAULT_SPEED);
         onTimer();
     }
 
