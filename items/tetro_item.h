@@ -38,7 +38,7 @@ public:
 
     void setPolygon(const QPolygonF & polygon) {
         QGraphicsPolygonItem::setPolygon(polygon);
-        setTransformOriginPoint(polygon.boundingRect().center());
+        setTransformOriginPoint(polygon.boundingRect().center() + QPointF(GRANULARITY / 2, 0));
     }
 
     bool isIntersectedLevel(int level) {

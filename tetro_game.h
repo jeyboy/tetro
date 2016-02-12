@@ -60,7 +60,6 @@ protected:
 
         qDebug() << intersected << active -> isIntersectedLevel(end_y_pos);
         if (intersected || active -> isIntersectedLevel(end_y_pos)) {
-            qDebug() << "INTESECTED";
             items.insert(active, active -> polygon().translated(active -> pos()));
             active = 0;
             onTimer();
