@@ -28,9 +28,9 @@ class TetroScene : public QGraphicsScene {
     };
 
     QTimer * timer;
-    QHash<TetroItem *, QPolygonF> items;
     TetroItem * active;
-    int start_x_pos, end_y_pos;
+    QList<QVector<bool> > places;
+    int start_x_pos, end_x_pos, end_y_pos;
 protected slots:
     void onTimer() {
         if (active == 0) {
@@ -42,7 +42,11 @@ protected slots:
         }
         else {
             if (checkCollision()) {
-                items.insert(active, active -> scenePolygon());
+                QList<QGraphicsItem *> children = active -> childItems();
+                for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
+                    QPointF point = (*ch) -> scenePos();
+                    places[point.x() / GRANULARITY][point.y() / GRANULARITY] = true;
+                }
                 active = 0;
                 onTimer();
             }
@@ -100,22 +104,22 @@ protected:
     }
 
     bool checkCollision() {
-        bool intersected = false;
 //        TetroItem * item = new TetroItem();
 //        item -> setPolygon(active -> scenePolygon());
 //        item -> setBrush(QBrush(Qt::black));
 //        addItem(item);
 
-        QPolygonF active_poly = active -> scenePolygon().translated(QPointF(0, GRANULARITY));
-        for(QHash<TetroItem *, QPolygonF>::ConstIterator item = items.cbegin(); item != items.cend(); item++) {
-            qDebug() << "PO" << active_poly << item.value() << item.value().intersected(active_poly);
-            if (!item.value().intersected(active_poly).isEmpty()) {
-                intersected = true;
-                break;
-            }
+        QList<QGraphicsItem *> children = active -> childItems();
+        for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
+            QPointF point = (*ch) -> scenePos() / GRANULARITY;
+            qDebug() << "CHECK" << (*ch) -> scenePos() << point << end_x_pos << end_y_pos;
+            if (point.x() < 0 || point.x() >= end_x_pos) return true;
+            if (point.y() >= end_y_pos) return true;
+            if (places[point.x()][point.y()])
+                return true;
         }
 
-        return (intersected || active -> isIntersectedLevel(end_y_pos));
+        return false;
     }
 
     TetroItem * generateItem(ItemTypes i = random_item) {
@@ -142,8 +146,12 @@ public:
         connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
         setSceneRect(0, 0, width, height);
-        start_x_pos = (width / GRANULARITY) / 2;
+        end_x_pos = width / GRANULARITY;
+        start_x_pos = end_x_pos / 2;
         end_y_pos = height / GRANULARITY;
+
+        for(int i = 0; i < end_x_pos; i++)
+            places.append(QVector<bool>().fill(false, end_y_pos));
     }
 
     void startTimer() {

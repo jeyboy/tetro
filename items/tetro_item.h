@@ -9,30 +9,38 @@
 
 #define GRANULARITY 24
 
-class TetroItem : public QGraphicsPolygonItem {
+class TetroItem : public QGraphicsRectItem {
 protected:
 public:
-    TetroItem(QGraphicsItem * parent = 0) : QGraphicsPolygonItem(parent) {
-        setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 3));
+    QPen pen;
+
+    TetroItem(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
+        pen = QPen(QBrush(QColor::fromRgb(0,0,0)), 2);
     }
 
     void rotate(qreal angle) { setRotation(rotation() + angle); }
 
-    void setPolygon(const QPolygonF & polygon) {
-        QGraphicsPolygonItem::setPolygon(polygon);
-        setTransformOriginPoint(polygon.boundingRect().center() + QPointF(GRANULARITY / 2, 0));
+    void setCentering() {
+        QPointF center = childrenBoundingRect().center();
+        QPointF offset((int)center.x() % GRANULARITY, (int)center.y() % GRANULARITY);
+        setTransformOriginPoint(center + offset);
     }
 
-    bool isIntersectedLevel(int level) {
-        return itemRect().bottom() / GRANULARITY >= level;
-    }
+//    void setPolygon(const QPolygonF & polygon) {
+//        QGraphicsPolygonItem::setPolygon(polygon);
+//        setTransformOriginPoint(polygon.boundingRect().center() + QPointF(GRANULARITY / 2, 0));
+//    }
 
-    QPolygonF scenePolygon() {
-        return mapToScene(polygon());
-    }
+//    bool isIntersectedLevel(int level) {
+//        return itemRect().bottom() / GRANULARITY >= level;
+//    }
+
+//    QPolygonF scenePolygon() {
+////        return mapToScene(polygon());
+//    }
 
     QRectF itemRect() const {
-        return QRectF(pos(), polygon().boundingRect().size());
+        return childrenBoundingRect().translated(pos());
     }
 };
 
