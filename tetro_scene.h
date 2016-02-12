@@ -41,16 +41,17 @@ protected slots:
             active -> setFocus();
         }
         else {
+            active -> pushDown();
             if (checkCollision()) {
+                active -> pushUp();
                 QList<QGraphicsItem *> children = active -> childItems();
                 for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
-                    QPointF point = (*ch) -> scenePos();
-                    places[point.x() / GRANULARITY][point.y() / GRANULARITY] = true;
+                    QPointF point = ((TetroPart *)*ch) -> gridPos();
+                    places[point.x()][point.y()] = true;
                 }
                 active = 0;
                 onTimer();
             }
-            else active -> setPos(active -> pos() + QPointF(0, GRANULARITY));
         }
     }
 protected:
@@ -75,27 +76,27 @@ protected:
         if (active) {
             switch(event -> key()) {
                 case Qt::Key_Left: {
-                    active -> setPos(active -> pos() - QPointF(GRANULARITY, 0));
+                    active -> pushLeft();
                     if (checkCollision())
-                        active -> setPos(active -> pos() + QPointF(GRANULARITY, 0));
+                        active -> pushRight();
                 break;}
 
                 case Qt::Key_Right: {
-                    active -> setPos(active -> pos() + QPointF(GRANULARITY, 0));
+                    active -> pushRight();
                     if (checkCollision())
-                        active -> setPos(active -> pos() - QPointF(GRANULARITY, 0));
+                        active -> pushLeft();
                 break;}
 
                 case Qt::Key_Down: {
-                    active -> setPos(active -> pos() + QPointF(0, GRANULARITY));
+                    active -> pushDown();
                     if (checkCollision())
-                        active -> setPos(active -> pos() - QPointF(0, GRANULARITY));
+                        active -> pushUp();
                 break;}
 
                 case Qt::Key_Space: {
-                    active -> rotate(90);
+                    active -> rotateClockwise();
                     if (checkCollision())
-                        active -> rotate(-90);
+                        active -> rotateCounterClockwise();
                 break;}
 
                 default: ;
@@ -109,10 +110,11 @@ protected:
 //        item -> setBrush(QBrush(Qt::black));
 //        addItem(item);
 
+        qDebug() << "---------------------------------------------------";
         QList<QGraphicsItem *> children = active -> childItems();
         for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
-            QPointF point = (*ch) -> scenePos() / GRANULARITY;
-            qDebug() << "CHECK" << (*ch) -> scenePos() << point << end_x_pos << end_y_pos;
+            QPointF point = ((TetroPart *)*ch) -> gridPos();
+            qDebug() << "CHECK" << ((TetroPart *)*ch) -> gridPos() << point << end_x_pos << end_y_pos;
             if (point.x() < 0 || point.x() >= end_x_pos) return true;
             if (point.y() >= end_y_pos) return true;
             if (places[point.x()][point.y()])

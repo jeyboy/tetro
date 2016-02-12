@@ -14,10 +14,10 @@ public:
 //        points << QPointF(0, 0) * GRANULARITY << QPointF(1, 0) * GRANULARITY <<
 //                  QPointF(1, 1) * GRANULARITY << QPointF(0, 1) * GRANULARITY;
 
-        QGraphicsRectItem * item = new QGraphicsRectItem(this);
-        item -> setRect(0, 0, GRANULARITY, GRANULARITY);
+        TetroPart * item = new TetroPart(this);
+        item -> setRect(0, 0, 1, 1);
         item -> setPen(pen);
-        setBrush(QBrush(QColor::fromRgb(24, 24, 24))); // not worked
+        item -> setBrush(QBrush(QColor::fromRgb(24, 24, 24)));
     }
 };
 

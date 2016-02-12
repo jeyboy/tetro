@@ -2,15 +2,15 @@
 #define TETRO_ITEM
 
 #include <qhash.h>
-#include <qgraphicsitem.h>
 #include <qevent.h>
 #include <qpen.h>
 #include <qdebug.h>
 
-#define GRANULARITY 24
+#include "tetro_part.h"
 
 class TetroItem : public QGraphicsRectItem {
 protected:
+    void rotate(qreal angle) { setRotation(rotation() + angle); }
 public:
     QPen pen;
 
@@ -18,26 +18,19 @@ public:
         pen = QPen(QBrush(QColor::fromRgb(0,0,0)), 2);
     }
 
-    void rotate(qreal angle) { setRotation(rotation() + angle); }
+    void pushUp() { setPos(pos() - QPointF(0, GRANULARITY)); }
+    void pushDown() { setPos(pos() + QPointF(0, GRANULARITY)); }
+    void pushLeft() { setPos(pos() - QPointF(GRANULARITY, 0)); }
+    void pushRight() { setPos(pos() + QPointF(GRANULARITY, 0)); }
+
+    void rotateClockwise() { rotate(90); }
+    void rotateCounterClockwise() { rotate(-90); }
 
     void setCentering() {
         QPointF center = childrenBoundingRect().center();
         QPointF offset((int)center.x() % GRANULARITY, (int)center.y() % GRANULARITY);
         setTransformOriginPoint(center + offset);
     }
-
-//    void setPolygon(const QPolygonF & polygon) {
-//        QGraphicsPolygonItem::setPolygon(polygon);
-//        setTransformOriginPoint(polygon.boundingRect().center() + QPointF(GRANULARITY / 2, 0));
-//    }
-
-//    bool isIntersectedLevel(int level) {
-//        return itemRect().bottom() / GRANULARITY >= level;
-//    }
-
-//    QPolygonF scenePolygon() {
-////        return mapToScene(polygon());
-//    }
 
     QRectF itemRect() const {
         return childrenBoundingRect().translated(pos());

@@ -15,25 +15,20 @@ class LiRevItem : public TetroItem {
 
 public:
     LiRevItem(QGraphicsItem * parent = 0) : TetroItem(parent) {
-//        QVector<QPointF> points;
-//        points << QPointF(0, 0) * GRANULARITY << QPointF(1, 0) * GRANULARITY <<
-//                  QPointF(1, 2) * GRANULARITY << QPointF(2, 2) * GRANULARITY <<
-//                  QPointF(2, 3) * GRANULARITY << QPointF(0, 3) * GRANULARITY;
-
-        QGraphicsRectItem * item = new QGraphicsRectItem(this);
-        item -> setRect(0, 0, GRANULARITY, GRANULARITY);
+        TetroPart * item = new TetroPart(this);
+        item -> setRect(0, 0, 1, 1);
         item -> setPen(pen);
 
-        item = new QGraphicsRectItem(this);
-        item -> setRect(0, GRANULARITY, GRANULARITY, GRANULARITY);
+        item = new TetroPart(this);
+        item -> setRect(0, 1, 1, 1);
         item -> setPen(pen);
 
-        item = new QGraphicsRectItem(this);
-        item -> setRect(0, 2 * GRANULARITY, GRANULARITY, GRANULARITY);
+        item = new TetroPart(this);
+        item -> setRect(0, 2, 1, 1);
         item -> setPen(pen);
 
-        item = new QGraphicsRectItem(this);
-        item -> setRect(GRANULARITY, 2 * GRANULARITY, GRANULARITY, GRANULARITY);
+        item = new TetroPart(this);
+        item -> setRect(1, 2, 1, 1);
         item -> setPen(pen);
 
         setCentering();
