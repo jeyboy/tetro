@@ -16,6 +16,25 @@ class TetroGame : public QGraphicsView {
     TetroScene * scene;
     QWidget * menu;
 public slots:
+    void start() {
+        scene -> reset();
+        scene -> startTimer();
+    }
+
+    void pause() { scene -> pauseTimer(); }
+    void resume() { scene -> startTimer(); }
+
+    void paused() {
+
+    }
+    void resumed() {
+
+    }
+
+    void showStartScreen() {
+
+    }
+
     void showGameOver() {
         pause();
         QLabel * label = new QLabel(QStringLiteral("Game is over :("));
@@ -23,13 +42,6 @@ public slots:
         f.setPixelSize(32);
         label -> setFont(f);
         scene -> addWidget(label);
-    }
-
-    void gameIsPaused() {
-
-    }
-    void gameIsResumed() {
-
     }
 public:
     TetroGame(QWidget * parent = 0) : QGraphicsView(parent) {
@@ -46,22 +58,11 @@ public:
         setScene(scene);
         setRenderHint(QPainter::Antialiasing);
         connect(scene, SIGNAL(gameOver()), this, SLOT(showGameOver()));
-        connect(scene, SIGNAL(paused()), this, SLOT(gameIsPaused()));
-        connect(scene, SIGNAL(resumed()), this, SLOT(gameIsResumed()));
+        connect(scene, SIGNAL(paused()), this, SLOT(paused()));
+        connect(scene, SIGNAL(resumed()), this, SLOT(resumed()));
     }
 
     ~TetroGame() { pause(); }
-
-    void showStartScreen() {
-
-    }
-
-    void start() {
-        scene -> clear();
-        scene -> startTimer();
-    }
-    void pause() { scene -> pauseTimer(); }
-    void resume() { scene -> startTimer(); }
 };
 
 #endif // TETRO_GAME

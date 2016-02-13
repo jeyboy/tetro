@@ -10,4 +10,6 @@
 #include "zu_item.h"
 #include "zu_rev_item.h"
 
+#include "text_item.h"
+
 #endif // ITEMS_INDEX

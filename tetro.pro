@@ -28,6 +28,7 @@ HEADERS  += mainwindow.h \
     items/zu_item.h \
     items/zu_rev_item.h \
     items/index.h \
-    items/tetro_part.h
+    items/tetro_part.h \
+    items/text_item.h
 
 FORMS    += mainwindow.ui

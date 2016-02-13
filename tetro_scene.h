@@ -12,6 +12,8 @@
 #include "items/index.h"
 
 #define DEFAULT_SPEED 500
+#define LEVEL_SPEED 25
+#define LINE_POINTS 100
 
 class TetroScene : public QGraphicsScene {
     Q_OBJECT
@@ -29,10 +31,13 @@ class TetroScene : public QGraphicsScene {
     };
 
     QTimer * timer;
-    TetroItem * active;
+    TetroItem * active, * next;
+    TextItem * level_text, * score_text, * lines_text, * figures_text;
     QList<QVector<TetroPart *> > places; // change on raw arrays
     int start_x_pos, end_x_pos, end_y_pos;
     int field_width, field_height;
+    int level, scores, lines, figures;
+    int info_offset_x;
 signals:
     void paused();
     void resumed();
@@ -104,11 +109,19 @@ protected:
     }
 
     void insertNewItem() {
-        active = generateItem();
-        addItem(active);
+        if (!next) {
+            active = generateItem();
+            addItem(active);
+        } else active = next;
+
         active -> setGridPos(start_x_pos, 0, true);
         active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
         active -> setFocus();
+        figures_text -> setText(QString::number(++figures));
+
+        next = generateItem();
+        next -> setGridPos(info_offset_x, 1);
+        addItem(next);
 
         if (checkCollision())
             emit gameOver();
@@ -168,7 +181,7 @@ protected:
         }
 
         int step = 0;
-        if (max != -999999)
+        if (max != -999999) {
             for(int y = max; y > -1; y--) {
                 if (removed.contains(y))
                     step += removed.take(y);
@@ -180,6 +193,9 @@ protected:
                     places.swap(y, y + step);
                 }
             }
+            lines_text -> setText(QString::number(lines += step));
+            score_text -> setText(QString::number(scores += level * step * LINE_POINTS));
+        }
     }
 
     TetroItem * generateItem(ItemTypes i = random_item) {
@@ -201,7 +217,10 @@ protected:
         }
     }
 public:
-    TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0), field_width(width), field_height(height) {
+    TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0), next(0),
+        level_text(0), score_text(0), lines_text(0), figures_text(0),
+        field_width(width), field_height(height), level(1), scores(0), lines(0), figures(0)
+    {
         setBackgroundBrush(QBrush(Qt::white));
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
@@ -210,15 +229,42 @@ public:
         end_x_pos = width / GRANULARITY;
         start_x_pos = end_x_pos / 2;
         end_y_pos = height / GRANULARITY;
+        info_offset_x = end_x_pos + 3;
 
         for(int i = 0; i < end_y_pos; i++)
             places.append(QVector<TetroPart *>().fill(0, end_x_pos));
     }
 
+    void reset() {
+        clear();
+        int base_top = 8;
+
+        level = 1;
+        scores = 0;
+        lines = 0;
+        figures = 0;
+
+        level_text = new TextItem(QStringLiteral("Level: "), QString::number(level));
+        level_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
+        addItem(level_text);
+
+        score_text  = new TextItem(QStringLiteral("Score: "), QString::number(scores));
+        score_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
+        addItem(score_text);
+
+        lines_text  = new TextItem(QStringLiteral("Lines: "), QString::number(lines));
+        lines_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
+        addItem(lines_text);
+
+        figures_text  = new TextItem(QStringLiteral("Figures: "), QString::number(figures));
+        figures_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
+        addItem(figures_text);
+    }
+
     void startTimer() {
-        timer -> start(DEFAULT_SPEED);
-        onTimer();
         qsrand(QDateTime::currentMSecsSinceEpoch() / 8);
+        timer -> start(DEFAULT_SPEED - (1 - level) * LEVEL_SPEED);
+        onTimer();
     }
 
     void pauseTimer() {
