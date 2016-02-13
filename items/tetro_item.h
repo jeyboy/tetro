@@ -12,15 +12,30 @@ class TetroItem : public QGraphicsRectItem {
 protected:
     void rotate(qreal angle) { setRotation(rotation() + angle); }
 public:
-    TetroItem(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
+    enum ItemAngle {
+        random = -1,
+        foward = 0,
+        left = 90,
+        bottom = 180,
+        right = 270
+    };
+
+    TetroItem(QGraphicsItem * parent = 0, ItemAngle angle = random) : QGraphicsRectItem(parent) {
         setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 2));
+
+        if (angle == random) angle = (ItemAngle)((qrand() % 5) * 90);
+        setRotation((int)angle);
     }
 
-    void setGridPos(int x, int y, bool xcentering = false) {
-        if (xcentering) {
-            QSizeF isize = childrenBoundingRect().size() / GRANULARITY;
-            x -= (int)isize.width() / 2/* - ((int)isize.width() % 2)*/;
+    void setGridPos(int x, int y, bool centering = false) {
+        if (centering) {
+            QRectF rect = childrenBoundingRect();
+            QSizeF isize = rect.size() / GRANULARITY;
+            x -= (int)isize.width() / 2;
             x = qMax(0, x);
+            y = qMax(0, y);
+            if (rect.top() < 0)
+                y = 0;
         }
 
         setPos(x * GRANULARITY, y * GRANULARITY);

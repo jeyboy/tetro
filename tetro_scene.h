@@ -5,6 +5,7 @@
 #include <qtimer.h>
 #include <qpainter.h>
 #include <qgraphicsscene.h>
+#include <qdatetime.h>
 //#include <qpropertyanimation.h>
 //#include <qgraphicseffect.h>
 
@@ -34,7 +35,7 @@ class TetroScene : public QGraphicsScene {
 protected slots:
     void onTimer() {
         if (active == 0) {
-            active = generateItem(line_item);
+            active = generateItem();
             addItem(active);
             active -> setGridPos(start_x_pos, 0, true);
             active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -200,6 +201,7 @@ public:
     void startTimer() {
         timer -> start(DEFAULT_SPEED);
         onTimer();
+        qsrand(QDateTime::currentMSecsSinceEpoch() / 8);
     }
 
     void pauseTimer() {
