@@ -12,10 +12,8 @@ class TetroItem : public QGraphicsRectItem {
 protected:
     void rotate(qreal angle) { setRotation(rotation() + angle); }
 public:
-    QPen pen;
-
     TetroItem(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
-        pen = QPen(QBrush(QColor::fromRgb(0,0,0)), 2);
+        setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 2));
     }
 
     void setGridPos(int x, int y, bool xcentering = false) {

@@ -8,11 +8,15 @@
 
 class TetroPart : public QGraphicsRectItem {
 public:
-    TetroPart(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {}
+    TetroPart(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
+        setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 2));
+    }
 
     void paint(QPainter * painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/ = 0) {
-        painter -> setPen(pen());
-        painter -> setBrush(brush());
+        QGraphicsRectItem * parent = (QGraphicsRectItem *)parentItem();
+
+        painter -> setPen(parent ? parent -> pen() : pen());
+        painter -> setBrush(parent ? parent -> brush() : brush());
         painter -> drawRoundedRect(boundingRect(), 4, 4);
     }
 

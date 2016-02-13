@@ -69,6 +69,8 @@ protected slots:
     }
 protected:
     void drawBackground(QPainter * painter, const QRectF & rect) {
+        QGraphicsScene::drawBackground(painter, rect);
+
         qreal left = int(rect.left()) - (int(rect.left()) % GRANULARITY);
         qreal top = int(rect.top()) - (int(rect.top()) % GRANULARITY);
 
@@ -81,8 +83,6 @@ protected:
 
         painter -> setPen(QColor::fromRgb(148, 148, 148, 32));
         painter -> drawLines(lines.data(), lines.size());
-
-        QGraphicsScene::drawBackground(painter, rect);
     }
 
     void keyPressEvent(QKeyEvent * event) {
@@ -184,6 +184,7 @@ protected:
     }
 public:
     TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0) {
+        setBackgroundBrush(QBrush(Qt::white));
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 

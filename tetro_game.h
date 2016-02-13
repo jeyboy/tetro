@@ -2,6 +2,7 @@
 #define TETRO_GAME
 
 #include <qgraphicsview.h>
+//#include <QOpenGLWidget>
 
 #include "tetro_scene.h"
 
@@ -18,6 +19,10 @@ public:
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+//        QOpenGLWidget * myWidget = new QOpenGLWidget(this);
+//        setViewport(myWidget);
+//        myWidget -> makeCurrent();
 
         scene = new TetroScene(SCREEN_WIDTH, SCREEN_HEIGHT, this);
         setScene(scene);
