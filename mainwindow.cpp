@@ -1,14 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainWindow)
-//  , xShift(100), yShift(100), scale(100), buttonSize(50)
-{
+MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui -> setupUi(this);
     game = new TetroGame(this);
     setCentralWidget(game);
 
-    game -> start();
+    game -> start(); //showStartScreen();
 }
 
 MainWindow::~MainWindow() {

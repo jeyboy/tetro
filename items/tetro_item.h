@@ -35,8 +35,10 @@ public:
             x -= (int)isize.width() / 2;
             x = qMax(0, x);
             y = qMax(0, y);
-            if (rect.top() < 0)
-                y = 0;
+
+            QRectF srect = sceneBoundingRect();
+            if (srect.top() < -2)
+                y = srect.top() / -GRANULARITY;
         }
 
         setPos(x * GRANULARITY, y * GRANULARITY);

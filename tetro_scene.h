@@ -32,7 +32,10 @@ class TetroScene : public QGraphicsScene {
     TetroItem * active;
     QList<QVector<TetroPart *> > places; // change on raw arrays
     int start_x_pos, end_x_pos, end_y_pos;
+    int field_width, field_height;
 signals:
+    void paused();
+    void resumed();
     void gameOver();
 
 protected slots:
@@ -44,22 +47,31 @@ protected slots:
 protected:
     void drawBackground(QPainter * painter, const QRectF & rect) {
         QGraphicsScene::drawBackground(painter, rect);
-
-        qreal left = int(rect.left()) - (int(rect.left()) % GRANULARITY);
-        qreal top = int(rect.top()) - (int(rect.top()) % GRANULARITY);
-
         QVarLengthArray<QLineF, 100> lines;
 
-        for (qreal x = left; x < rect.right(); x += GRANULARITY)
-            lines.append(QLineF(x, rect.top(), x, rect.bottom()));
-        for (qreal y = top; y < rect.bottom(); y += GRANULARITY)
-            lines.append(QLineF(rect.left(), y, rect.right(), y));
+        qreal limit_x = field_width;
+        qreal limit_y = field_height;
+
+        for (qreal x = 0; x < limit_x; x += GRANULARITY)
+            lines.append(QLineF(x, 0, x, limit_y));
+        for (qreal y = 0; y < limit_y; y += GRANULARITY)
+            lines.append(QLineF(0, y, limit_x, y));
 
         painter -> setPen(QColor::fromRgb(148, 148, 148, 32));
         painter -> drawLines(lines.data(), lines.size());
     }
 
     void keyPressEvent(QKeyEvent * event) {
+        if (event -> key() == Qt::Key_Escape) {
+            if (timer -> isActive()) {
+                pauseTimer();
+                emit paused();
+            } else {
+                startTimer();
+                emit resumed();
+            }
+        }
+
         if (active) {
             switch(event -> key()) {
                 case Qt::Key_Left: {
@@ -145,10 +157,13 @@ protected:
     void removeRows(const QList<int> & rows) {
         int max = -999999;
 
+        qDebug() << "-----------------------------------------";
+
         QHash<int, int> removed;
 
         for(QList<int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
             if (!places[*y].contains(0)) {
+                qDebug() << (*y);
                 qDeleteAll(places[*y]);
                 places[*y] = QVector<TetroPart *>().fill(0, end_x_pos);
                 max = qMax(max, *y);
@@ -190,7 +205,7 @@ protected:
         }
     }
 public:
-    TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0) {
+    TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0), field_width(width), field_height(height) {
         setBackgroundBrush(QBrush(Qt::white));
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
