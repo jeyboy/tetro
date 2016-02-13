@@ -44,6 +44,7 @@ public:
 
         scene = new TetroScene(SCREEN_WIDTH, SCREEN_HEIGHT, this);
         setScene(scene);
+        setRenderHint(QPainter::Antialiasing);
         connect(scene, SIGNAL(gameOver()), this, SLOT(showGameOver()));
         connect(scene, SIGNAL(paused()), this, SLOT(gameIsPaused()));
         connect(scene, SIGNAL(resumed()), this, SLOT(gameIsResumed()));

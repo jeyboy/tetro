@@ -156,14 +156,10 @@ protected:
 
     void removeRows(const QList<int> & rows) {
         int max = -999999;
-
-        qDebug() << "-----------------------------------------";
-
         QHash<int, int> removed;
 
         for(QList<int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
             if (!places[*y].contains(0)) {
-                qDebug() << (*y);
                 qDeleteAll(places[*y]);
                 places[*y] = QVector<TetroPart *>().fill(0, end_x_pos);
                 max = qMax(max, *y);
