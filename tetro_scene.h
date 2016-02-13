@@ -112,6 +112,7 @@ protected:
         if (!next) {
             active = generateItem();
             addItem(active);
+            active -> rotate(TetroItem::random);
         } else active = next;
 
         active -> setGridPos(start_x_pos, 0, true);
@@ -120,6 +121,7 @@ protected:
         figures_text -> setText(QString::number(++figures));
 
         next = generateItem();
+        next -> rotate(TetroItem::random);
         next -> setGridPos(info_offset_x, 1);
         addItem(next);
 
