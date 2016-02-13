@@ -20,8 +20,8 @@ public:
         QGraphicsRectItem::setRect(QRectF(ax * GRANULARITY + 2, ay * GRANULARITY + 2, w * GRANULARITY - 4, h * GRANULARITY - 4));
     }
 
-    void setGridPos(QPointF pos) { setRect(pos.x(), pos.y(), 1, 1); }
-    void iterateGridPos(QPointF iter) { setGridPos(gridPos() + iter); }
+    void setGridPos(QPoint pos) { setRect(pos.x(), pos.y(), 1, 1); }
+    void iterateGridPos(QPoint iter) { setGridPos(gridPos().toPoint() + iter); }
 
     QPointF gridPos() { return sceneBoundingRect().topLeft() / GRANULARITY; }
 };

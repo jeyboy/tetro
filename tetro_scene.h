@@ -56,7 +56,7 @@ protected slots:
                         places[point.y()][point.x()] = part;
                         rows.insert(point.y(), false);
                         part -> setParentItem(0);
-                        part -> setGridPos(point);
+                        part -> setGridPos(point.toPoint());
                     }
                 }
 
@@ -158,7 +158,7 @@ protected:
                     QVector<TetroPart *> parts = places[y];
                     for(QVector<TetroPart *>::Iterator part = parts.begin(); part != parts.end(); part++)
                         if ((*part))
-                            (*part) -> iterateGridPos(QPointF(0, step));
+                            (*part) -> iterateGridPos(QPoint(0, step));
                     places.swap(y, y + step);
                 }
             }
