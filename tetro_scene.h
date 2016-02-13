@@ -196,7 +196,7 @@ protected:
                 }
             }
             lines_text -> setText(QString::number(lines += step));
-            score_text -> setText(QString::number(scores += level * step * LINE_POINTS));
+            score_text -> setText(QString::number(scores += level * (step * LINE_POINTS + (step - 1 * LINE_POINTS))));
         }
     }
 
