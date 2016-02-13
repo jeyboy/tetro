@@ -34,7 +34,7 @@ class TetroScene : public QGraphicsScene {
 protected slots:
     void onTimer() {
         if (active == 0) {
-            active = generateItem();
+            active = generateItem(line_item);
             addItem(active);
             active -> setGridPos(start_x_pos, 0, true);
             active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -43,14 +43,27 @@ protected slots:
         else {
             active -> pushDown();
             if (checkCollision()) {
+                pauseTimer();
                 active -> pushUp();
-                QList<QGraphicsItem *> children = active -> childItems();
-                for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
-                    QPointF point = ((TetroPart *)*ch) -> gridPos();
-                    places[point.x()][point.y()] = ((TetroPart *)*ch);
+
+                QHash<int, bool> rows;
+                {
+                    QList<QGraphicsItem *> children = active -> childItems();
+
+                    for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
+                        TetroPart * part = ((TetroPart *)*ch);
+                        QPointF point = part -> gridPos();
+                        places[point.y()][point.x()] = part;
+                        rows.insert(point.y(), false);
+                        part -> setParentItem(0);
+                        part -> setGridPos(point);
+                    }
                 }
+
+                delete active;
                 active = 0;
-                onTimer();
+                removeRows(rows.keys());
+                startTimer();
             }
         }
     }
@@ -115,11 +128,40 @@ protected:
             QPointF point = ((TetroPart *)*ch) -> gridPos();
             if (point.x() < 0 || point.x() >= end_x_pos) return true;
             if (point.y() < 0 || point.y() >= end_y_pos) return true;
-            if (places[point.x()][point.y()])
+            if (places[point.y()][point.x()])
                 return true;
         }
 
         return false;
+    }
+
+    void removeRows(const QList<int> & rows) {
+        int max = -999999;
+
+        QHash<int, int> removed;
+
+        for(QList<int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
+            if (!places[*y].contains(0)) {
+                qDeleteAll(places[*y]);
+                places[*y] = QVector<TetroPart *>().fill(0, end_x_pos);
+                max = qMax(max, *y);
+                removed.insert(*y, 1);
+            }
+        }
+
+        int step = 0;
+        if (max != -999999)
+            for(int y = max; y > -1; y--) {
+                if (removed.contains(y))
+                    step += removed.take(y);
+                else {
+                    QVector<TetroPart *> parts = places[y];
+                    for(QVector<TetroPart *>::Iterator part = parts.begin(); part != parts.end(); part++)
+                        if ((*part))
+                            (*part) -> iterateGridPos(QPointF(0, step));
+                    places.swap(y, y + step);
+                }
+            }
     }
 
     TetroItem * generateItem(ItemTypes i = random_item) {
@@ -150,8 +192,8 @@ public:
         start_x_pos = end_x_pos / 2;
         end_y_pos = height / GRANULARITY;
 
-        for(int i = 0; i < end_x_pos; i++)
-            places.append(QVector<TetroPart *>().fill(0, end_y_pos));
+        for(int i = 0; i < end_y_pos; i++)
+            places.append(QVector<TetroPart *>().fill(0, end_x_pos));
     }
 
     void startTimer() {
