@@ -30,43 +30,16 @@ class TetroScene : public QGraphicsScene {
 
     QTimer * timer;
     TetroItem * active;
-    QList<QVector<TetroPart *> > places;
+    QList<QVector<TetroPart *> > places; // change on raw arrays
     int start_x_pos, end_x_pos, end_y_pos;
+signals:
+    void gameOver();
+
 protected slots:
     void onTimer() {
-        if (active == 0) {
-            active = generateItem();
-            addItem(active);
-            active -> setGridPos(start_x_pos, 0, true);
-            active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
-            active -> setFocus();
-        }
-        else {
-            active -> pushDown();
-            if (checkCollision()) {
-                pauseTimer();
-                active -> pushUp();
-
-                QHash<int, bool> rows;
-                {
-                    QList<QGraphicsItem *> children = active -> childItems();
-
-                    for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
-                        TetroPart * part = ((TetroPart *)*ch);
-                        QPointF point = part -> gridPos();
-                        places[point.y()][point.x()] = part;
-                        rows.insert(point.y(), false);
-                        part -> setParentItem(0);
-                        part -> setGridPos(point.toPoint());
-                    }
-                }
-
-                delete active;
-                active = 0;
-                removeRows(rows.keys());
-                startTimer();
-            }
-        }
+        if (active == 0)
+            insertNewItem();
+        else moveItem();
     }
 protected:
     void drawBackground(QPainter * painter, const QRectF & rect) {
@@ -118,12 +91,45 @@ protected:
         }
     }
 
-    bool checkCollision() {
-//        TetroItem * item = new TetroItem();
-//        item -> setPolygon(active -> scenePolygon());
-//        item -> setBrush(QBrush(Qt::black));
-//        addItem(item);
+    void insertNewItem() {
+        active = generateItem();
+        addItem(active);
+        active -> setGridPos(start_x_pos, 0, true);
+        active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
+        active -> setFocus();
 
+        if (checkCollision())
+            emit gameOver();
+    }
+
+    void moveItem() {
+        active -> pushDown();
+        if (checkCollision()) {
+            pauseTimer();
+            active -> pushUp();
+
+            QHash<int, bool> rows;
+            {
+                QList<QGraphicsItem *> children = active -> childItems();
+
+                for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
+                    TetroPart * part = ((TetroPart *)*ch);
+                    QPointF point = part -> gridPos();
+                    places[point.y()][point.x()] = part;
+                    rows.insert(point.y(), false);
+                    part -> setParentItem(0);
+                    part -> setGridPos(point.toPoint());
+                }
+            }
+
+            delete active;
+            active = 0;
+            removeRows(rows.keys());
+            startTimer();
+        }
+    }
+
+    bool checkCollision() {
         QList<QGraphicsItem *> children = active -> childItems();
         for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
             QPointF point = ((TetroPart *)*ch) -> gridPos();
