@@ -10,6 +10,7 @@ class TetroPart : public QGraphicsRectItem {
 public:
     TetroPart(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
         setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 2));
+        setBrush(QBrush(QColor::fromRgb(192, 192, 192, 192)));
     }
 
     void paint(QPainter * painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/ = 0) {

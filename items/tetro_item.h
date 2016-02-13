@@ -22,6 +22,7 @@ public:
 
     TetroItem(QGraphicsItem * parent = 0, ItemAngle angle = random) : QGraphicsRectItem(parent) {
         setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 2));
+        setBrush(QBrush(QColor::fromRgb(qrand() % 255, qrand() % 255, qrand() % 255, 128)));
 
         if (angle == random) angle = (ItemAngle)((qrand() % 5) * 90);
         setRotation((int)angle);
