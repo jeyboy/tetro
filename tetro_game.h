@@ -23,6 +23,7 @@ protected:
     void buildMenu() {
         QPoint center = QPoint(parentWidget() -> width() / 2, parentWidget() -> height() / 2);
         startBtn -> setGeometry(center.x() - START_BTN_SIZE / 2, center.y() - START_BTN_SIZE / 2, START_BTN_SIZE, START_BTN_SIZE);
+        startBtn -> setDisabled(false);
 
         QPropertyAnimation * animation = new QPropertyAnimation(startBtn, "geometry");
         animation -> setDuration(1000);
@@ -41,6 +42,7 @@ public slots:
         animation -> setEasingCurve(QEasingCurve::Linear);
         animation -> setEndValue(QRectF(center.x(), center.y(), 0, 0));
         animation -> start(QAbstractAnimation::DeleteWhenStopped);
+        startBtn -> setDisabled(true);
 
         scene -> reset();
         scene -> startTimer();

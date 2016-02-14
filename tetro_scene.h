@@ -266,6 +266,9 @@ public:
         figures_text  = new TextItem(QStringLiteral("Figures: "), QString::number(figures));
         figures_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
         addItem(figures_text);
+
+        active = 0;
+        next = 0;
     }
 
     void startTimer() {
