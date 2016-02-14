@@ -37,6 +37,7 @@ class TetroScene : public QGraphicsScene {
     TextItem * level_text, * score_text, * lines_text, * figures_text;
     QPropertyAnimation * rotateAnimation;
     QList<QVector<TetroPart *> > places; // change on raw arrays
+    QVector<int> weights;
     int start_x_pos, end_x_pos, end_y_pos;
     int field_width, field_height;
     int level, scores, lines, figures;
@@ -146,7 +147,9 @@ protected:
                     TetroPart * part = ((TetroPart *)*ch);
                     QPointF point = part -> gridPos();
                     places[point.y()][point.x()] = part;
-                    rows.insert(point.y(), false);
+                    weights[point.y()]++;
+                    if (weights[point.y()] == end_x_pos)
+                        rows.insert(point.y(), false);
                     part -> setParentItem(0);
                     part -> setGridPos(point.toPoint());
                 }
@@ -154,7 +157,8 @@ protected:
 
             delete active;
             active = 0;
-            removeRows(rows.keys());
+            if (!rows.isEmpty())
+                removeRows(rows.keys());
             startTimer();
         }
     }
@@ -177,12 +181,11 @@ protected:
         QHash<int, int> removed;
 
         for(QList<int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
-            if (!places[*y].contains(0)) {
-                qDeleteAll(places[*y]);
-                places[*y] = QVector<TetroPart *>().fill(0, end_x_pos);
-                max = qMax(max, *y);
-                removed.insert(*y, 1);
-            }
+            qDeleteAll(places[*y]);
+            places[*y] = QVector<TetroPart *>().fill(0, end_y_pos);
+            weights[*y] = 0;
+            max = qMax(max, *y);
+            removed.insert(*y, 1);
         }
 
         int step = 0;
@@ -196,6 +199,7 @@ protected:
                         if ((*part))
                             (*part) -> iterateGridPos(QPoint(0, step));
                     places.swap(y, y + step);
+                    qSwap(weights[y], weights[y + step]);
                 }
             }
             lines_text -> setText(QString::number(lines += step));
@@ -236,6 +240,7 @@ public:
         end_y_pos = height / GRANULARITY;
         info_offset_x = end_x_pos + 3;
 
+        weights.fill(0, end_y_pos);
         for(int i = 0; i < end_y_pos; i++)
             places.append(QVector<TetroPart *>().fill(0, end_x_pos));
     }
