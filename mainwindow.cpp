@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainW
     game = new TetroGame(this);
     setCentralWidget(game);
 
-    game -> start(); //showStartScreen();
+    game -> showStartScreen();
 }
 
 MainWindow::~MainWindow() {

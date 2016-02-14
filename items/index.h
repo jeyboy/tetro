@@ -11,5 +11,6 @@
 #include "zu_rev_item.h"
 
 #include "text_item.h"
+#include "rotation_container.h"
 
 #endif // ITEMS_INDEX

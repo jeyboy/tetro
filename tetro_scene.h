@@ -1,12 +1,14 @@
 #ifndef TETRO_SCENE
 #define TETRO_SCENE
 
-//#include <math.h>
+#include <math.h>
 #include <qtimer.h>
 #include <qpainter.h>
 #include <qgraphicsscene.h>
 #include <qdatetime.h>
-//#include <qpropertyanimation.h>
+
+#include <qpropertyanimation.h>
+
 //#include <qgraphicseffect.h>
 
 #include "items/index.h"
@@ -33,6 +35,7 @@ class TetroScene : public QGraphicsScene {
     QTimer * timer;
     TetroItem * active, * next;
     TextItem * level_text, * score_text, * lines_text, * figures_text;
+    QPropertyAnimation * rotateAnimation;
     QList<QVector<TetroPart *> > places; // change on raw arrays
     int start_x_pos, end_x_pos, end_y_pos;
     int field_width, field_height;
@@ -220,7 +223,7 @@ protected:
     }
 public:
     TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0), next(0),
-        level_text(0), score_text(0), lines_text(0), figures_text(0),
+        level_text(0), score_text(0), lines_text(0), figures_text(0), rotateAnimation(0),
         field_width(width), field_height(height), level(1), scores(0), lines(0), figures(0)
     {
         setBackgroundBrush(QBrush(Qt::white));
@@ -239,6 +242,8 @@ public:
 
     void reset() {
         clear();
+        if (rotateAnimation) rotateAnimation -> stop();
+        rotateAnimation = 0;
         int base_top = 8;
 
         level = 1;
@@ -271,6 +276,33 @@ public:
 
     void pauseTimer() {
         timer -> stop();
+    }
+
+    void buildAnimationScreen(const QPoint & center) {
+        int limit = 7, xShift = 100, yShift = 100;
+        float angleUnit = 6.28 / limit;
+
+        RotationContainer * container = new RotationContainer();
+        for(int i = 0; i < limit; i++) {
+            TetroItem * item = generateItem((ItemTypes)i);
+            item -> setParentItem(container);
+            item -> setPos(
+                cos(angleUnit * i) * center.x() / 2 + xShift,
+                sin(angleUnit * i) * center.y() / 2 + yShift
+            );
+        }
+
+        container -> setPos(-25, 65);
+        container -> setTransformOriginPoint(container -> childrenBoundingRect().center());
+        addItem(container);
+
+        rotateAnimation = new QPropertyAnimation(container, "rotation");
+        rotateAnimation -> setDuration(10000);
+        rotateAnimation -> setEasingCurve(QEasingCurve::Linear);
+        rotateAnimation -> setStartValue(0);
+        rotateAnimation -> setEndValue(359);
+        rotateAnimation -> setLoopCount(-1);
+        rotateAnimation -> start(QAbstractAnimation::DeleteWhenStopped);
     }
 };
 
