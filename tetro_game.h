@@ -90,8 +90,11 @@ public:
         connect(scene, SIGNAL(resumed()), this, SLOT(resumed()));
 
         startBtn = new QPushButton(QStringLiteral("Start"), this);
+        QFont font = startBtn -> font();
+        font.setPixelSize(24);
+        startBtn -> setFont(font);
         startBtn -> setGeometry(0,0,0,0);
-        startBtn -> setStyleSheet(QStringLiteral("border-radius: 6px; background-color: #EEE; border: 2px solid #ff0000"));
+        startBtn -> setStyleSheet(QStringLiteral("border-radius: 6px; background-color: #EEE; border: 3px solid #0000bb"));
         connect(startBtn, SIGNAL(clicked(bool)), this, SLOT(start()));
 
         buildMenu();
