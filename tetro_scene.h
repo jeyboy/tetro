@@ -280,19 +280,21 @@ public:
 
     void buildAnimationScreen(const QPoint & center) {
         int limit = 7, xShift = 100, yShift = 100;
+        int scale = qMin(center.x(), center.y()) * 0.7;
         float angleUnit = 6.28 / limit;
 
         RotationContainer * container = new RotationContainer();
+
         for(int i = 0; i < limit; i++) {
             TetroItem * item = generateItem((ItemTypes)i);
             item -> setParentItem(container);
             item -> setPos(
-                cos(angleUnit * i) * center.x() / 2 + xShift,
-                sin(angleUnit * i) * center.y() / 2 + yShift
+                cos(angleUnit * i) * scale + xShift,
+                sin(angleUnit * i) * scale + yShift
             );
         }
 
-        container -> setPos(-25, 65);
+        container -> setPos(container -> childrenBoundingRect().translated(0, 0).center() / 2 - QPoint(90, 0));
         container -> setTransformOriginPoint(container -> childrenBoundingRect().center());
         addItem(container);
 
