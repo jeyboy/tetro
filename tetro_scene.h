@@ -36,8 +36,7 @@ class TetroScene : public QGraphicsScene {
     TetroItem * active, * next;
     TextItem * level_text, * score_text, * lines_text, * figures_text;
     QPropertyAnimation * rotateAnimation;
-    QList<QVector<TetroPart *> > places; // change on raw arrays
-    QVector<int> weights;
+    QList<QPair<QVector<TetroPart *>, int> > places; // change on raw arrays
     int start_x_pos, end_x_pos, end_y_pos;
     int field_width, field_height;
     int level, scores, lines, figures;
@@ -112,6 +111,12 @@ protected:
         }
     }
 
+    void fillMatrix() {
+        places.clear();
+        for(int i = 0; i < end_y_pos; i++)
+            places.append(QPair<QVector<TetroPart *>, int>(QVector<TetroPart *>().fill(0, end_x_pos), 0));
+    }
+
     void insertNewItem() {
         if (!next) {
             active = generateItem();
@@ -146,9 +151,8 @@ protected:
                 for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
                     TetroPart * part = ((TetroPart *)*ch);
                     QPointF point = part -> gridPos();
-                    places[point.y()][point.x()] = part;
-                    weights[point.y()]++;
-                    if (weights[point.y()] == end_x_pos)
+                    places[point.y()].first[point.x()] = part;
+                    if (++places[point.y()].second == end_x_pos)
                         rows.insert(point.y(), false);
                     part -> setParentItem(0);
                     part -> setGridPos(point.toPoint());
@@ -169,7 +173,7 @@ protected:
             QPointF point = ((TetroPart *)*ch) -> gridPos();
             if (point.x() < 0 || point.x() >= end_x_pos) return true;
             if (point.y() < 0 || point.y() >= end_y_pos) return true;
-            if (places[point.y()][point.x()])
+            if (places[point.y()].first[point.x()])
                 return true;
         }
 
@@ -181,9 +185,8 @@ protected:
         QHash<int, int> removed;
 
         for(QList<int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
-            qDeleteAll(places[*y]);
-            places[*y] = QVector<TetroPart *>().fill(0, end_y_pos);
-            weights[*y] = 0;
+            qDeleteAll(places[*y].first);
+            places[*y] = QPair<QVector<TetroPart *>, int>(QVector<TetroPart *>().fill(0, end_y_pos), 0);
             max = qMax(max, *y);
             removed.insert(*y, 1);
         }
@@ -194,12 +197,11 @@ protected:
                 if (removed.contains(y))
                     step += removed.take(y);
                 else {
-                    QVector<TetroPart *> parts = places[y];
+                    QVector<TetroPart *> parts = places[y].first;
                     for(QVector<TetroPart *>::Iterator part = parts.begin(); part != parts.end(); part++)
                         if ((*part))
                             (*part) -> iterateGridPos(QPoint(0, step));
                     places.swap(y, y + step);
-                    qSwap(weights[y], weights[y + step]);
                 }
             }
             lines_text -> setText(QString::number(lines += step));
@@ -240,9 +242,7 @@ public:
         end_y_pos = height / GRANULARITY;
         info_offset_x = end_x_pos + 3;
 
-        weights.fill(0, end_y_pos);
-        for(int i = 0; i < end_y_pos; i++)
-            places.append(QVector<TetroPart *>().fill(0, end_x_pos));
+        fillMatrix();
     }
 
     void reset() {
@@ -274,6 +274,7 @@ public:
 
         active = 0;
         next = 0;
+        fillMatrix();
     }
 
     void startTimer() {
