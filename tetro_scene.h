@@ -146,7 +146,7 @@ protected:
             pauseTimer();
             active -> pushUp();
 
-            QHash<int, bool> rows;
+            QHash<int, int> rows;
             {
                 QList<QGraphicsItem *> children = active -> childItems();
 
@@ -155,7 +155,7 @@ protected:
                     QPointF point = part -> gridPos();
                     places[point.y()].first[point.x()] = part;
                     if (++places[point.y()].second == end_x_pos)
-                        rows.insert(point.y(), false);
+                        rows.insert(point.y(), 1);
                     part -> setParentItem(0);
                     part -> setGridPos(point.toPoint());
                 }
@@ -164,7 +164,7 @@ protected:
             delete active;
             active = 0;
             if (!rows.isEmpty())
-                removeRows(rows.keys());
+                removeRows(rows);
             startTimer();
         }
     }
@@ -182,33 +182,29 @@ protected:
         return false;
     }
 
-    void removeRows(const QList<int> & rows) {
+    void removeRows(const QHash<int, int> & rows) {
         int max = -999999;
-        QHash<int, int> removed;
 
-        for(QList<int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
-            qDeleteAll(places[*y].first);
-            places[*y] = QPair<QVector<TetroPart *>, int>(QVector<TetroPart *>().fill(0, end_y_pos), 0);
-            max = qMax(max, *y);
-            removed.insert(*y, 1);
+        for(QHash<int, int>::ConstIterator y = rows.cbegin(); y != rows.cend(); y++) {
+            qDeleteAll(places[y.key()].first);
+            places[y.key()] = QPair<QVector<TetroPart *>, int>(QVector<TetroPart *>().fill(0, end_y_pos), 0);
+            max = qMax(max, y.key());
         }
 
         int step = 0;
-        if (max != -999999) {
-            for(int y = max; y > -1; y--) {
-                if (removed.contains(y))
-                    step += removed.take(y);
-                else {
-                    QVector<TetroPart *> parts = places[y].first;
-                    for(QVector<TetroPart *>::Iterator part = parts.begin(); part != parts.end(); part++)
-                        if ((*part))
-                            (*part) -> iterateGridPos(QPoint(0, step));
-                    places.swap(y, y + step);
-                }
+        for(int y = max; y > -1; y--) {
+            if (rows.contains(y))
+                step += rows[y];
+            else {
+                QVector<TetroPart *> parts = places[y].first;
+                for(QVector<TetroPart *>::Iterator part = parts.begin(); part != parts.end(); part++)
+                    if ((*part))
+                        (*part) -> iterateGridPos(QPoint(0, step));
+                places.swap(y, y + step);
             }
-            lines_text -> setText(QString::number(lines += step));
-            score_text -> setText(QString::number(scores += level * (step * LINE_POINTS + (step - 1 * LINE_POINTS))));
         }
+        lines_text -> setText(QString::number(lines += step));
+        score_text -> setText(QString::number(scores += level * (step * LINE_POINTS + (step - 1 * LINE_POINTS))));
     }
 
     TetroItem * generateItem(ItemTypes i = random_item) {
@@ -225,7 +221,6 @@ protected:
             case zu_item: return new ZuItem();
             case zu_rev_item: return new ZuRevItem();
             default:
-                qDebug() << "PI";
                 return new RectItem();
         }
     }
