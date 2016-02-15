@@ -75,8 +75,10 @@ protected:
                 pauseTimer();
                 emit paused();
             } else {
-                startTimer();
-                emit resumed();
+                if (active) {
+                    startTimer();
+                    emit resumed();
+                }
             }
         }
 
