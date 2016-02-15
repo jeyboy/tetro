@@ -45,6 +45,7 @@ public slots:
         startBtn -> setDisabled(true);
 
         scene -> reset();
+        setFocus();
         scene -> startTimer();
     }
 
@@ -72,6 +73,7 @@ public slots:
         animation -> setEndValue(QRectF(center.x(), center.y(), 0, 0));
         animation -> start(QAbstractAnimation::DeleteWhenStopped);
         resumeBtn -> setDisabled(true);
+        setFocus();
     }
 
     void showStartScreen() {
