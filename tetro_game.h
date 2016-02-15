@@ -20,29 +20,29 @@ class TetroGame : public QGraphicsView {
     TetroScene * scene;
     QPushButton * startBtn, * resumeBtn;
 protected:
+    void buildAnimation(QObject * obj, const QRectF & end, const QRectF & start = QRectF()) {
+        QPropertyAnimation * animation = new QPropertyAnimation(obj, "geometry");
+        animation -> setDuration(500);
+        animation -> setEasingCurve(QEasingCurve::Linear);
+        if (!start.isEmpty())
+            animation -> setStartValue(start);
+        animation -> setEndValue(end);
+        animation -> start(QAbstractAnimation::DeleteWhenStopped);
+    }
     void buildMenu() {
         QPoint center = QPoint(parentWidget() -> width() / 2, parentWidget() -> height() / 2);
-        startBtn -> setGeometry(center.x() - START_BTN_SIZE / 2, center.y() - START_BTN_SIZE / 2, START_BTN_SIZE, START_BTN_SIZE);
-        startBtn -> setDisabled(false);
 
-        QPropertyAnimation * animation = new QPropertyAnimation(startBtn, "geometry");
-        animation -> setDuration(1000);
-        animation -> setEasingCurve(QEasingCurve::Linear);
-        animation -> setStartValue(QRectF(center.x(), center.y(), 0, 0));
-        animation -> setEndValue(QRectF(center.x() - START_BTN_SIZE / 2, center.y() - START_BTN_SIZE / 2, START_BTN_SIZE, START_BTN_SIZE));
-        animation -> start(QAbstractAnimation::DeleteWhenStopped);
+        buildAnimation(startBtn,
+            QRectF(center.x() - START_BTN_SIZE / 2, center.y() - START_BTN_SIZE / 2, START_BTN_SIZE, START_BTN_SIZE),
+            QRectF(center.x(), center.y(), 0, 0)
+        );
 
         scene -> buildAnimationScreen(center);
     }
 public slots:
     void start() {
         QPoint center = QPoint(parentWidget() -> width() / 2, parentWidget() -> height() / 2);
-        QPropertyAnimation * animation = new QPropertyAnimation(startBtn, "geometry");
-        animation -> setDuration(500);
-        animation -> setEasingCurve(QEasingCurve::Linear);
-        animation -> setEndValue(QRectF(center.x(), center.y(), 0, 0));
-        animation -> start(QAbstractAnimation::DeleteWhenStopped);
-        startBtn -> setDisabled(true);
+        buildAnimation(startBtn, QRectF(center.x(), center.y(), 0, 0));
 
         scene -> reset();
         setFocus();
@@ -57,22 +57,15 @@ public slots:
 
     void paused() {
         QPoint center = QPoint(parentWidget() -> width() / 2, parentWidget() -> height() / 2);
-        QPropertyAnimation * animation = new QPropertyAnimation(resumeBtn, "geometry");
-        resumeBtn -> setDisabled(false);
-        animation -> setDuration(500);
-        animation -> setEasingCurve(QEasingCurve::Linear);
-        animation -> setStartValue(QRectF(center.x(), center.y(), 0, 0));
-        animation -> setEndValue(QRectF(center.x() - START_BTN_SIZE / 2, center.y() - START_BTN_SIZE / 2, START_BTN_SIZE, START_BTN_SIZE));
-        animation -> start(QAbstractAnimation::DeleteWhenStopped);
+
+        buildAnimation(resumeBtn,
+            QRectF(center.x() - START_BTN_SIZE / 2, center.y() - START_BTN_SIZE / 2, START_BTN_SIZE, START_BTN_SIZE),
+            QRectF(center.x(), center.y(), 0, 0)
+        );
     }
     void resumed() {
         QPoint center = QPoint(parentWidget() -> width() / 2, parentWidget() -> height() / 2);
-        QPropertyAnimation * animation = new QPropertyAnimation(resumeBtn, "geometry");
-        animation -> setDuration(500);
-        animation -> setEasingCurve(QEasingCurve::Linear);
-        animation -> setEndValue(QRectF(center.x(), center.y(), 0, 0));
-        animation -> start(QAbstractAnimation::DeleteWhenStopped);
-        resumeBtn -> setDisabled(true);
+        buildAnimation(resumeBtn, QRectF(center.x(), center.y(), 0, 0));
         setFocus();
     }
 
