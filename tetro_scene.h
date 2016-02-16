@@ -108,7 +108,7 @@ protected:
 
                 case Qt::Key_Space: {
                     active -> rotateClockwise();
-                    if (checkCollision())
+                    if (checkCollision(true))
                         active -> rotateCounterClockwise();
                 break;}
 
@@ -173,14 +173,36 @@ protected:
         }
     }
 
-    bool checkCollision() {
+    bool checkCollision(bool can_move = false) {
         QList<QGraphicsItem *> children = active -> childItems();
         for(QList<QGraphicsItem *>::Iterator ch = children.begin(); ch != children.end(); ch++) {
-            QPointF point = ((TetroPart *)*ch) -> gridPos();
-            if (point.x() < 0 || point.x() >= end_x_pos) return true;
-            if (point.y() < 0 || point.y() >= end_y_pos) return true;
-            if (places[point.y()].first[point.x()])
+            QPoint point = ((TetroPart *)*ch) -> gridPos().toPoint();
+            QPoint correction;
+
+            if (point.x() < 0) {
+                if (can_move)
+                    correction.setX(-point.x());
+                else return true;
+            }
+
+            if (point.x() >= end_x_pos) {
+                if (can_move)
+                    correction.setX((point.x() - 1 - end_x_pos));
+                else return true;
+            }
+
+            if (point.y() < 0) {
+                if (can_move)
+                    correction.setY(-point.y());
+                else return true;
+            }
+
+            if (point.y() >= end_y_pos) return true;
+
+            if (places[point.y() + correction.y()].first[point.x() + correction.x()])
                 return true;
+
+            active -> setPos(active -> pos() + correction * GRANULARITY) ;
         }
 
         return false;
