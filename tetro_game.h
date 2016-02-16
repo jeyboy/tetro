@@ -8,10 +8,8 @@
 
 #include "tetro_scene.h"
 
-#define SCREEN_WIDTH 9 * GRANULARITY + 1
-#define SCREEN_HEIGHT 16 * GRANULARITY + 1
-
-#define MENU_SIZE 300
+#define SCREEN_WIDTH 10 * GRANULARITY + 1
+#define SCREEN_HEIGHT 18 * GRANULARITY + 1
 #define START_BTN_SIZE 100
 
 class TetroGame : public QGraphicsView {
