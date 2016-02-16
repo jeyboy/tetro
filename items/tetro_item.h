@@ -10,7 +10,19 @@
 
 class TetroItem : public QGraphicsRectItem {
 protected:
-    void rotate(qreal angle) { setRotation(rotation() + angle); }
+    void rotate(qreal angle, bool moveCenter = false) {
+        if (moveCenter) {
+            QPointF tp = transformOriginPoint();
+            QPointF center = childrenBoundingRect().center();
+            QPointF offset = tp - center;
+            offset.setY(offset.y() * -1);
+            setRotation(rotation() - angle);
+            setTransformOriginPoint(center - offset);
+            setRotation(rotation() + angle);
+            setTransformOriginPoint(tp);
+        }
+        else setRotation(rotation() + angle);
+    }
 public:
     enum ItemAngle {
         random = -1,
@@ -49,6 +61,7 @@ public:
     void pushRight() { setPos(pos() + QPointF(GRANULARITY, 0)); }
 
     void rotateClockwise() { rotate(90); }
+    void rotateClockwiseEx() { rotate(90); }
     void rotateCounterClockwise() { rotate(-90); }
     void rotate(ItemAngle angle) {
         if (angle == random) angle = (ItemAngle)((qrand() % 5) * 90);

@@ -108,8 +108,11 @@ protected:
 
                 case Qt::Key_Space: {
                     active -> rotateClockwise();
-                    if (checkCollision())
-                        active -> rotateCounterClockwise();
+                    if (checkCollision()) {
+                        active -> rotateClockwiseEx();
+                        if (checkCollision())
+                            active -> rotateCounterClockwise();
+                    }
                 break;}
 
                 default: ;
