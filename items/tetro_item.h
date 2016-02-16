@@ -57,8 +57,7 @@ public:
 
     void setCentering() {
         QPointF center = childrenBoundingRect().center();
-        QPointF offset((int)center.x() % GRANULARITY, (int)center.y() % GRANULARITY);
-        setTransformOriginPoint(center + offset);
+        setTransformOriginPoint(center);
     }
 
     QRectF sceneChildrenBoundingRect() {

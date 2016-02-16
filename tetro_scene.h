@@ -14,7 +14,7 @@
 #include "items/index.h"
 
 #define DEFAULT_SPEED 500
-#define LEVEL_SPEED 40
+#define LEVEL_SPEED 50
 #define LINE_POINTS 100
 
 #define BCOLOR QColor::fromRgb(148, 148, 148, 32)
@@ -56,6 +56,21 @@ protected slots:
         else moveItem();
     }
 protected:
+    bool procRotation() {
+        QPointF center = active -> scenePos();
+        QPointF offset((int)center.x() % GRANULARITY, (int)center.y() % GRANULARITY);
+        int move_offset = (int)active -> rotation() % 360 >= 180 ? -1 : 1;
+
+        active -> setPos(active -> pos() + offset * move_offset);
+        if (checkCollision()) {
+            move_offset *= -1;
+            active -> setPos(active -> pos() + offset * 2 * move_offset);
+            return !checkCollision();
+        }
+
+        return true;
+    }
+
     void drawBackground(QPainter * painter, const QRectF & rect) {
         QGraphicsScene::drawBackground(painter, rect);
         QVarLengthArray<QLineF, 100> lines;
@@ -108,7 +123,7 @@ protected:
 
                 case Qt::Key_Space: {
                     active -> rotateClockwise();
-                    if (checkCollision())
+                    if (!procRotation())
                         active -> rotateCounterClockwise();
                 break;}
 
@@ -131,6 +146,7 @@ protected:
         } else active = next;
 
         active -> setGridPos(start_x_pos, 0, true);
+        procRotation();
         active -> setFlag(QGraphicsItem::ItemIsFocusable, true);
         active -> setFocus();
         figures_text -> setText(QString::number(++figures));
