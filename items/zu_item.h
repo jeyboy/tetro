@@ -14,7 +14,7 @@ class ZuItem : public TetroItem {
 //     --------
 
 public:
-    ZuItem(QGraphicsItem * parent = 0) : TetroItem(parent) {
+    ZuItem(QGraphicsItem * parent = 0) : TetroItem(parent, QColor::fromRgb(228, 0, 39, 128)) {
         TetroPart * item = new TetroPart(this);
         item -> setRect(0, 0, 1, 1);
 

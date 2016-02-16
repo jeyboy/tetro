@@ -15,7 +15,7 @@ class LineItem : public TetroItem {
 // ----
 
 public:
-    LineItem(QGraphicsItem * parent = 0) : TetroItem(parent) {
+    LineItem(QGraphicsItem * parent = 0) : TetroItem(parent, QColor::fromRgb(0, 228, 228, 128)) {
         TetroPart * item = new TetroPart(this);
         item -> setRect(0, 0, 1, 1);
 

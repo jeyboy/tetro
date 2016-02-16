@@ -73,6 +73,15 @@ public slots:
         buildMenu();
     }
 
+    void showCongratulations() {
+        pause();
+        QLabel * label = new QLabel(QStringLiteral("Congratulations!!! :)"));
+        QFont f = label -> font();
+        f.setPixelSize(32);
+        label -> setFont(f);
+        scene -> addWidget(label);
+    }
+
     void showGameOver() {
         pause();
         QLabel * label = new QLabel(QStringLiteral("Game is over :("));
@@ -97,21 +106,23 @@ public:
         setRenderHint(QPainter::Antialiasing);
         setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
         connect(scene, SIGNAL(gameOver()), this, SLOT(showGameOver()));
+        connect(scene, SIGNAL(congratulations()), this, SLOT(showCongratulations()));
         connect(scene, SIGNAL(paused()), this, SLOT(paused()));
         connect(scene, SIGNAL(resumed()), this, SLOT(resumed()));
 
         startBtn = new QPushButton(QStringLiteral("Start"), this);
         QFont font = startBtn -> font();
         font.setPixelSize(24);
+        font.setBold(true);
         startBtn -> setFont(font);
         startBtn -> setGeometry(0,0,0,0);
-        startBtn -> setStyleSheet(QStringLiteral("border-radius: 6px; background-color: #EEE; border: 3px solid #0000bb"));
+        startBtn -> setStyleSheet(QStringLiteral("border-radius: 6px; background-color: #999; border: 3px solid #0000bb; color: #fff;"));
         connect(startBtn, SIGNAL(clicked(bool)), this, SLOT(start()));
 
         resumeBtn = new QPushButton(QStringLiteral("Resume"), this);
         resumeBtn -> setFont(font);
         resumeBtn -> setGeometry(0,0,0,0);
-        resumeBtn -> setStyleSheet(QStringLiteral("border-radius: 6px; background-color: #EEE; border: 3px solid #0000bb"));
+        resumeBtn -> setStyleSheet(QStringLiteral("border-radius: 6px; background-color: #999; border: 3px solid #0000bb; color: #fff;"));
         connect(resumeBtn, SIGNAL(clicked(bool)), this, SLOT(resume()));
 
         buildMenu();

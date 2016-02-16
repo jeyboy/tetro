@@ -14,7 +14,7 @@ class LiItem : public TetroItem {
 // --------
 
 public:
-    LiItem(QGraphicsItem * parent = 0) : TetroItem(parent) {
+    LiItem(QGraphicsItem * parent = 0) : TetroItem(parent, QColor::fromRgb(0, 78, 228, 128)) {
         TetroPart * item = new TetroPart(this);
         item -> setRect(1, 0, 1, 1);
 

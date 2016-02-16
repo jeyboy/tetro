@@ -14,8 +14,10 @@
 #include "items/index.h"
 
 #define DEFAULT_SPEED 500
-#define LEVEL_SPEED 25
+#define LEVEL_SPEED 40
 #define LINE_POINTS 100
+
+#define BCOLOR QColor::fromRgb(148, 148, 148, 32)
 
 class TetroScene : public QGraphicsScene {
     Q_OBJECT
@@ -45,6 +47,7 @@ signals:
     void paused();
     void resumed();
     void gameOver();
+    void congratulations();
 
 protected slots:
     void onTimer() {
@@ -60,12 +63,13 @@ protected:
         qreal limit_x = field_width;
         qreal limit_y = field_height;
 
+        painter -> fillRect(0, 0, limit_x, limit_y, Qt::white);
         for (qreal x = 0; x < limit_x; x += GRANULARITY)
             lines.append(QLineF(x, 0, x, limit_y));
         for (qreal y = 0; y < limit_y; y += GRANULARITY)
             lines.append(QLineF(0, y, limit_x, y));
 
-        painter -> setPen(QColor::fromRgb(148, 148, 148, 32));
+        painter -> setPen(BCOLOR);
         painter -> drawLines(lines.data(), lines.size());
     }
 
@@ -205,6 +209,10 @@ protected:
         }
         lines_text -> setText(QString::number(lines += step));
         score_text -> setText(QString::number(scores += level * (step * LINE_POINTS + (step - 1 * LINE_POINTS))));
+        level_text -> setText(QString::number(level = (lines / 20) + 1));
+
+        if (level >= 9)
+            emit congratulations();
     }
 
     TetroItem * generateItem(ItemTypes i = random_item) {
@@ -229,7 +237,7 @@ public:
         level_text(0), score_text(0), lines_text(0), figures_text(0), rotateAnimation(0),
         field_width(width), field_height(height), level(1), scores(0), lines(0), figures(0)
     {
-        setBackgroundBrush(QBrush(Qt::white));
+        setBackgroundBrush(QBrush(BCOLOR));
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
@@ -252,20 +260,27 @@ public:
         scores = 0;
         lines = 0;
         figures = 0;
+        QFont f = font();
+        f.setBold(true);
+        f.setPixelSize(16);
 
         level_text = new TextItem(QStringLiteral("Level: "), QString::number(level));
+        level_text -> setFont(f);
         level_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
         addItem(level_text);
 
         score_text  = new TextItem(QStringLiteral("Score: "), QString::number(scores));
+        score_text -> setFont(f);
         score_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
         addItem(score_text);
 
         lines_text  = new TextItem(QStringLiteral("Lines: "), QString::number(lines));
+        lines_text -> setFont(f);
         lines_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
         addItem(lines_text);
 
         figures_text  = new TextItem(QStringLiteral("Figures: "), QString::number(figures));
+        figures_text -> setFont(f);
         figures_text -> setPos(info_offset_x * GRANULARITY, base_top++ * GRANULARITY);
         addItem(figures_text);
 
@@ -276,7 +291,7 @@ public:
 
     void startTimer() {
         qsrand(QDateTime::currentMSecsSinceEpoch() / 8);
-        timer -> start(DEFAULT_SPEED - (1 - level) * LEVEL_SPEED);
+        timer -> start(DEFAULT_SPEED + (1 - level) * LEVEL_SPEED);
         onTimer();
     }
 
@@ -305,10 +320,10 @@ public:
         addItem(container);
 
         rotateAnimation = new QPropertyAnimation(container, "rotation");
-        rotateAnimation -> setDuration(10000);
+        rotateAnimation -> setDuration(24000);
         rotateAnimation -> setEasingCurve(QEasingCurve::Linear);
         rotateAnimation -> setStartValue(0);
-        rotateAnimation -> setEndValue(359);
+        rotateAnimation -> setEndValue(360);
         rotateAnimation -> setLoopCount(-1);
         rotateAnimation -> start(QAbstractAnimation::DeleteWhenStopped);
     }

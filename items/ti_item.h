@@ -13,7 +13,7 @@ class TiItem : public TetroItem {
 //     ----
 
 public:
-    TiItem(QGraphicsItem * parent = 0) : TetroItem(parent) {
+    TiItem(QGraphicsItem * parent = 0) : TetroItem(parent, QColor::fromRgb(156, 19, 228, 128)) {
         TetroPart * item = new TetroPart(this);
         item -> setRect(0, 0, 1, 1);
 

@@ -14,7 +14,7 @@ class LiRevItem : public TetroItem {
 // --------
 
 public:
-    LiRevItem(QGraphicsItem * parent = 0) : TetroItem(parent) {
+    LiRevItem(QGraphicsItem * parent = 0) : TetroItem(parent, QColor::fromRgb(228, 98, 0, 128)) {
         TetroPart * item = new TetroPart(this);
         item -> setRect(0, 0, 1, 1);
 

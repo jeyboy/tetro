@@ -20,9 +20,9 @@ public:
         right = 270
     };
 
-    TetroItem(QGraphicsItem * parent = 0) : QGraphicsRectItem(parent) {
+    TetroItem(QGraphicsItem * parent = 0, const QColor & color = QColor(0,0,0,0)) : QGraphicsRectItem(parent) {
         setPen(QPen(QBrush(QColor::fromRgb(0,0,0)), 2));
-        setBrush(QBrush(QColor::fromRgb(qrand() % 255, qrand() % 255, qrand() % 255, 128)));
+        setBrush(QBrush(color));
     }
 
     void setGridPos(int x, int y, bool centering = false) {
