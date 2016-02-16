@@ -43,11 +43,13 @@ class TetroScene : public QGraphicsScene {
     int field_width, field_height;
     int level, scores, lines, figures;
     int info_offset_x;
+    bool ended;
 signals:
     void paused();
     void resumed();
     void gameOver();
     void congratulations();
+    void newGame();
 
 protected slots:
     void onTimer() {
@@ -75,6 +77,12 @@ protected:
 
     void keyPressEvent(QKeyEvent * event) {
         if (event -> key() == Qt::Key_Escape) {
+            if (ended) {
+                reset();
+                emit newGame();
+                return;
+            }
+
             if (timer -> isActive()) {
                 pauseTimer();
                 emit paused();
@@ -140,8 +148,10 @@ protected:
         next -> setGridPos(info_offset_x, 1);
         addItem(next);
 
-        if (checkCollision())
+        if (checkCollision()) {
+            ended = true;
             emit gameOver();
+        }
     }
 
     void moveItem() {
@@ -257,7 +267,7 @@ protected:
 public:
     TetroScene(int width, int height, QObject * parent = 0) : QGraphicsScene(parent), active(0), next(0),
         level_text(0), score_text(0), lines_text(0), figures_text(0), rotateAnimation(0),
-        field_width(width), field_height(height), level(1), scores(0), lines(0), figures(0)
+        field_width(width), field_height(height), level(1), scores(0), lines(0), figures(0), ended(false)
     {
         setBackgroundBrush(QBrush(BCOLOR));
         timer = new QTimer(this);
@@ -308,6 +318,7 @@ public:
 
         active = 0;
         next = 0;
+        ended = false;
         fillMatrix();
     }
 

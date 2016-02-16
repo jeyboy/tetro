@@ -107,6 +107,7 @@ public:
         connect(scene, SIGNAL(congratulations()), this, SLOT(showCongratulations()));
         connect(scene, SIGNAL(paused()), this, SLOT(paused()));
         connect(scene, SIGNAL(resumed()), this, SLOT(resumed()));
+        connect(scene, SIGNAL(newGame()), this, SLOT(showStartScreen()));
 
         startBtn = new QPushButton(QStringLiteral("Start"), this);
         QFont font = startBtn -> font();
